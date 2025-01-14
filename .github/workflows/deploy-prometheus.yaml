@@ -1,0 +1,60 @@
+name: Deploy prometheus&grafana in AWS EC2 kubernetes cluster
+
+on:
+  push:
+    branches:
+      - main
+
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Choose the branch.'
+        required: true
+        default: 'main'
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.inputs.branch }}
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::116981781406:role/github-k8s-tools-role
+          role-session-name: github-k8s-tools-role
+          aws-region: eu-central-1
+
+      - name: Get KUBECONFIG file
+        run: |
+          aws s3 cp s3://k8s-bucket-workloads/admin.conf $HOME
+          mkdir -p $HOME/.kube
+          cp -i $HOME/admin.conf $HOME/.kube/config
+          chmod 755 $HOME/.kube/config
+          export KUBECONFIG=$HOME/.kube/config
+
+      - name: Configure kubectl
+        run: |
+          curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+          chmod +x ./kubectl
+          sudo mv ./kubectl /usr/local/bin/kubectl
+
+      - name: Install HELM
+        run: |
+          curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+          chmod +x get_helm.sh
+          ./get_helm.sh
+
+      - name: Deploy with Helm
+        run: |
+          helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+          helm repo update
+          helm upgrade --install monitoring prometheus-community/kube-prometheus-stack -f ./kube-prometheus-stack/values.yaml -n monitoring --create-namespace
