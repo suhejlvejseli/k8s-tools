@@ -1087,6 +1087,8 @@ grafana:
     create: true
     autoMount: true
 
+   envFromSecret: client-secrets-grafana   #This secret needs to be created and store the client_secret encoded
+
   grafana.ini:
     server:
       root_url: http://localhost:3000/
@@ -1095,7 +1097,7 @@ grafana:
       allow_sign_up: true
       auto_login: false
       client_id: Ov23liWrCs49WDjKHpTw
-      client_secret: 8bc0a2ad6426be99490123254f0874740d948f96 #$__env{client_secret}
+      client_secret: $__env{client_secret}
       scopes: user:email,read:org
       auth_url: https://github.com/login/oauth/authorize
       token_url: https://github.com/login/oauth/access_token
