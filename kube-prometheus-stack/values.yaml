@@ -1056,7 +1056,7 @@ grafana:
     ## Hostnames.
     ## Must be provided if Ingress is enable.
     ##
-    # hosts:
+    hosts:
       - grafana.fiek-cluster.com
     hosts: []
 
