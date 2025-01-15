@@ -1036,17 +1036,17 @@ grafana:
   ingress:
     ## If true, Grafana Ingress will be created
     ##
-    enabled: false
+    enabled: true
 
     ## IngressClassName for Grafana Ingress.
     ## Should be provided if Ingress is enable.
     ##
-    # ingressClassName: nginx
+    ingressClassName: nginx
 
     ## Annotations for Grafana Ingress
     ##
-    annotations: {}
-      # kubernetes.io/ingress.class: nginx
+    annotations: 
+      kubernetes.io/ingress.class: nginx
       # kubernetes.io/tls-acme: "true"
 
     ## Labels to be added to the Ingress
@@ -1057,7 +1057,7 @@ grafana:
     ## Must be provided if Ingress is enable.
     ##
     # hosts:
-    #   - grafana.domain.com
+      - grafana.fiek-cluster.com
     hosts: []
 
     ## Path for grafana ingress
