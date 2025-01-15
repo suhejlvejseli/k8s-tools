@@ -1087,7 +1087,8 @@ grafana:
     create: true
     autoMount: true
 
-   envFromSecret: client-secrets-grafana   #This secret needs to be created and store the client_secret encoded
+  
+  envFromSecret: client-secrets-grafana   #This secret needs to be created and store the client_secret encoded
 
   grafana.ini:
     server:
