@@ -1092,7 +1092,7 @@ grafana:
 
   grafana.ini:
     server:
-      root_url: http://localhost:3000/
+      root_url: http://grafana.fiek-cluster.com:3000/
     auth.github:
       enabled: true
       allow_sign_up: true
