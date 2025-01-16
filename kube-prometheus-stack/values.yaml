@@ -1088,7 +1088,7 @@ grafana:
     autoMount: true
 
   
-  envFromSecret: client-secrets-grafana   #This secret needs to be created and store the client_secret encoded
+  envFromSecret: client-secret-grafana   #This secret needs to be created and stored the client_secret encoded
 
   grafana.ini:
     server:
@@ -4011,16 +4011,18 @@ prometheus:
     ## Prometheus StorageSpec for persistent data
     ## ref: https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/user-guides/storage.md
     ##
-    storageSpec: {}
+    storageSpec: 
     ## Using PersistentVolumeClaim
     ##
-    #  volumeClaimTemplate:
-    #    spec:
-    #      storageClassName: gluster
-    #      accessModes: ["ReadWriteOnce"]
-    #      resources:
-    #        requests:
-    #          storage: 50Gi
+      volumeClaimTemplate:
+        metadata:
+          name: prometheus-pvc
+        spec:
+          storageClassName: local-path
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 2Gi
     #    selector: {}
 
     ## Using tmpfs volume
