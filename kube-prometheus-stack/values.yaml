@@ -3147,7 +3147,7 @@ prometheus:
   # Thanos sidecar on prometheus nodes
   # (Please remember to change ${kube-prometheus-stack.fullname} and ${namespace}. Not just copy and paste!)
   thanosService:
-    enabled: false
+    enabled: true
     annotations: {}
     labels: {}
 
@@ -3178,7 +3178,7 @@ prometheus:
 
     ## ClusterIP to assign
     # Default is to make this a headless service ("None")
-    clusterIP: "None"
+    clusterIP: ""
 
     ## Port to expose on each node, if service type is NodePort
     ##
@@ -4170,7 +4170,8 @@ prometheus:
     ## This is experimental and may change significantly without backward compatibility in any release.
     ## ref: https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#thanosspec
     ##
-    thanos: {}
+    thanos: 
+      image: quay.io/thanos/thanos:v0.28.1
       # secretProviderClass:
       #   provider: gcp
       #   parameters:
@@ -4178,11 +4179,11 @@ prometheus:
       #       - resourceName: "projects/$PROJECT_ID/secrets/testsecret/versions/latest"
       #         fileName: "objstore.yaml"
       ## ObjectStorageConfig configures object storage in Thanos.
-      # objectStorageConfig:
+      objectStorageConfig:
       #   # use existing secret, if configured, objectStorageConfig.secret will not be used
-      #   existingSecret: {}
-      #     # name: ""
-      #     # key: ""
+        existingSecret: 
+          name: "thanos-objstore-config"
+          key: "thanos.yaml"
       #   # will render objectStorageConfig secret data and configure it to be used by Thanos custom resource,
       #   # ignored when prometheusspec.thanos.objectStorageConfig.existingSecret is set
       #   # https://thanos.io/tip/thanos/storage.md/#s3
