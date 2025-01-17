@@ -307,6 +307,7 @@ alertmanager:
   config:
     global:
       resolve_timeout: 5m
+      slack_api_url: "https://hooks.slack.com/services/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"
     inhibit_rules:
       - source_matchers:
           - 'severity = critical'
@@ -331,17 +332,34 @@ alertmanager:
       - target_matchers:
           - 'alertname = InfoInhibitor'
     route:
-      group_by: ['namespace']
+      group_by: ['job']
       group_wait: 30s
       group_interval: 5m
       repeat_interval: 12h
-      receiver: 'null'
+      receiver: 'slack'
       routes:
-      - receiver: 'null'
-        matchers:
-          - alertname = "Watchdog"
+      - match:
+          alertname: DeadMansSwitch
+        receiver: 'null'
+      - match:
+        receiver: 'slack'
+        continue: true
     receivers:
     - name: 'null'
+    - name: slack
+      slack_configs:
+      - channel: "#all-prometheus-grafana-alerts"
+        send_resolved: true
+        title: '[{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] Monitoring Event Notification'
+        text: >-
+          {{ range .Alerts }}
+            *Alert:* {{ .Annotations.summary }} - `{{ .Labels.severity }}`
+            *Description:* {{ .Annotations.description }}
+            *Graph:* <{{ .GeneratorURL }}|:chart_with_upwards_trend:> *Runbook:* <{{ .Annotations.runbook }}|:spiral_note_pad:>
+            *Details:*
+            {{ range .Labels.SortedPairs }} • *{{ .Name }}:* `{{ .Value }}`
+            {{ end }}
+          {{ end }}
     templates:
     - '/etc/alertmanager/config/*.tmpl'
 
