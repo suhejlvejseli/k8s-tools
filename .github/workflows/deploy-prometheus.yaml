@@ -53,6 +53,17 @@ jobs:
           chmod +x get_helm.sh
           ./get_helm.sh
 
+      - name: Create GitHub OAuth & Thanos secrets
+        env:
+          CLIENT_SECRET_GRAFANA: ${{ secrets.CLIENT_SECRET_GRAFANA }}
+        run: |
+          kubectl create ns monitoring || true
+          kubectl create secret generic client-secret-grafana -n monitoring --from-literal=client_secret="${CLIENT_SECRET_GRAFANA}" --dry-run=client -oyaml > client-secret-grafana.yaml
+          kubectl apply -f client-secret-grafana.yaml
+          aws s3 cp s3://k8s-bucket-config-files/thanos-storage-config.yaml .
+          kubectl -n monitoring create secret generic thanos-objstore-config --from-file=thanos.yaml=thanos-storage-config.yaml
+        continue-on-error: true
+
       - name: Deploy with Helm
         run: |
           helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
