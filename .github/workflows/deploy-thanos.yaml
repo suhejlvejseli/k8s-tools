@@ -60,6 +60,10 @@ jobs:
           kubectl -n thanos create secret generic thanos-objectstorage --from-file=thanos.yaml=thanos-storage-config.yaml
         continue-on-error: true
 
+      - name: Wait for Prometheus
+        run: |
+          sleep 120
+
       - name: Deploy Thanos 
         run: |
           kubectl apply -f ./thanos/manifests/
