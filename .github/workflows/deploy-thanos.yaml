@@ -1,4 +1,4 @@
-name: Deploy prometheus&grafana in AWS EC2 kubernetes cluster
+name: Deploy Thanos in AWS EC2 kubernetes cluster
 
 on:
   push:
@@ -53,19 +53,13 @@ jobs:
           chmod +x get_helm.sh
           ./get_helm.sh
 
-      - name: Create GitHub OAuth & Thanos secrets
-        env:
-          CLIENT_SECRET_GRAFANA: ${{ secrets.CLIENT_SECRET_GRAFANA }}
+      - name: Create Thanos secret
         run: |
-          kubectl create ns monitoring || true
-          kubectl create secret generic client-secret-grafana -n monitoring --from-literal=client_secret="${CLIENT_SECRET_GRAFANA}" --dry-run=client -oyaml > client-secret-grafana.yaml
-          kubectl apply -f client-secret-grafana.yaml
+          kubectl create ns thanos
           aws s3 cp s3://k8s-bucket-config-files/thanos-storage-config.yaml .
-          kubectl -n monitoring create secret generic thanos-objstore-config --from-file=thanos.yaml=thanos-storage-config.yaml
+          kubectl -n thanos create secret generic thanos-objectstorage --from-file=thanos.yaml=thanos-storage-config.yaml
         continue-on-error: true
 
-      - name: Deploy with Helm
+      - name: Deploy Thanos 
         run: |
-          helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-          helm repo update
-          helm upgrade --install monitoring prometheus-community/kube-prometheus-stack -f ./kube-prometheus-stack/values.yaml -n monitoring --create-namespace
+          kubectl apply -f ./thanos/manifests/
