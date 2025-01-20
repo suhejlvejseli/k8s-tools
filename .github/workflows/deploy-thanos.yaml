@@ -57,7 +57,7 @@ jobs:
         run: |
           kubectl create ns thanos
           aws s3 cp s3://k8s-bucket-config-files/thanos-storage-config.yaml .
-          kubectl -n thanos create secret generic thanos-objectstorage --from-file=thanos.yaml=thanos/thanos-storage-config.yaml
+          kubectl -n thanos create secret generic thanos-objectstorage --from-file=thanos.yaml=thanos-storage-config.yaml
         continue-on-error: true
 
       - name: Wait for Prometheus
