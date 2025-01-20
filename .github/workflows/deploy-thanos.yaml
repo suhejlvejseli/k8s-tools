@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - main
+    paths:
+      - "thanos/manifests/**"
+      - ".github/workflows/deploy-thanos.yaml"
 
   workflow_dispatch:
     inputs:

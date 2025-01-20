@@ -1204,7 +1204,14 @@ grafana:
 
   ## Configure additional grafana datasources (passed through tpl)
   ## ref: http://docs.grafana.org/administration/provisioning/#datasources
-  additionalDataSources: []
+  additionalDataSources: 
+    - name: thanos
+      type: prometheus
+      access: proxy
+      url: http://thanos-query.thanos.svc.cluster.local:9090
+      editable: true
+      version: 1
+
   # - name: prometheus-sample
   #   access: proxy
   #   basicAuth: true
