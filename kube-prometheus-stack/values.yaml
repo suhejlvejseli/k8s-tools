@@ -708,8 +708,8 @@ alertmanager:
     ## on scaling down and deleting statefulset, respectively.
     ## Requires Kubernetes version 1.27.0+.
     ## Ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#persistentvolumeclaim-retention
-    persistentVolumeClaimRetentionPolicy: {}
-    #  whenDeleted: Retain
+    persistentVolumeClaimRetentionPolicy: 
+      whenDeleted: Retain
     #  whenScaled: Retain
 
     ## Standard object's metadata. More info: https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md#metadata
@@ -3937,7 +3937,7 @@ prometheus:
 
     ## Enable compression of the write-ahead log using Snappy.
     ##
-    walCompression: true
+    walCompression: false
 
     ## If true, the Operator won't process any Prometheus configuration changes
     ##
@@ -4179,7 +4179,7 @@ prometheus:
       seccompProfile:
         type: RuntimeDefault
 
-    ## Priority class assigned to the Pods
+    ## Priority class assigned to the Podshelm upgrade --install monitoring prometheus-community/kube-prometheus-stack -f ./kube-prometheus-stack/values.yaml -n monitoring --create-namespace
     ##
     priorityClassName: ""
 
@@ -4189,8 +4189,7 @@ prometheus:
     ## ref: https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#thanosspec
     ##
     thanos: 
-      baseImage: quay.io/thanos/thanos
-      version: v0.35.1
+      image: quay.io/thanos/thanos:v0.37.2
       objectStorageConfig:
         existingSecret: 
           key: "thanos.yaml"
@@ -4209,7 +4208,22 @@ prometheus:
 
     ## Containers allows injecting additional containers. This is meant to allow adding an authentication proxy to a Prometheus pod.
     ## if using proxy extraContainer update targetPort with proxy container port
-    containers: []
+    containers: 
+      - name: prometheus
+        args:
+        - "--web.console.templates=/etc/prometheus/consoles"
+        - "--web.console.libraries=/etc/prometheus/console_libraries"
+        - "--config.file=/etc/prometheus/config_out/prometheus.env.yaml"
+        - "--web.enable-lifecycle"
+        - "--web.external-url=http://monitoring-kube-prometheus-prometheus.monitoring:9090"
+        - "--web.route-prefix=/"
+        - "--storage.tsdb.retention.time=10d"
+        - "--storage.tsdb.path=/prometheus"
+        - "--storage.tsdb.wal-compression"
+        - "--web.config.file=/etc/prometheus/web_config/web-config.yaml"
+        - "--storage.tsdb.max-block-duration=10m"
+        - "--storage.tsdb.min-block-duration=10m"
+
     # containers:
     # - name: oauth-proxy
     #   image: quay.io/oauth2-proxy/oauth2-proxy:v7.5.1
