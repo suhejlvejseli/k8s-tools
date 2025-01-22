@@ -4,10 +4,6 @@ on:
   push:
     branches:
       - main
-    paths:
-      - "thanos/manifests/**"
-      - "loki/**"
-      - ".github/workflows/deploy-thanos.yaml"
 
   workflow_dispatch:
     inputs:
