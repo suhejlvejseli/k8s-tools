@@ -1,0 +1,4 @@
+s3: s3://eu-central-1/logging-s3bucket
+region: eu-central-1
+access_key_id: <SET HERE>
+secret_access_key: <SECRET KEY>
