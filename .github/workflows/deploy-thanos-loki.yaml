@@ -1,4 +1,4 @@
-name: Deploy Thanos in AWS EC2 kubernetes cluster
+name: Deploy Thanos&Loki in AWS EC2 kubernetes cluster
 
 on:
   push:
@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - "thanos/manifests/**"
+      - "loki/**"
       - ".github/workflows/deploy-thanos.yaml"
 
   workflow_dispatch:
@@ -70,3 +71,14 @@ jobs:
       - name: Deploy Thanos 
         run: |
           kubectl apply -f ./thanos/manifests/
+
+      - name: Deploy Loki
+        env:
+          AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          helm repo add grafana https://grafana.github.io/helm-charts
+          helm repo update
+          helm upgrade --install loki grafana/loki-stack -n logging --create-namespace --values ./loki/values.yaml \
+          --set loki.config.storage_config.aws.access_key_id=$AWS_ACCESS_KEY_ID \
+          --set loki.config.storage_config.aws.secret_access_key=$AWS_SECRET_ACCESS_KEY
