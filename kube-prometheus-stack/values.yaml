@@ -1211,6 +1211,12 @@ grafana:
       url: http://thanos-query.thanos.svc.cluster.local:9090
       editable: true
       version: 1
+    - name: loki
+      type: loki
+      access: proxy
+      url: http://loki.logging.svc.cluster.local:3100
+      editable: true
+      version: 1
 
   # - name: prometheus-sample
   #   access: proxy
